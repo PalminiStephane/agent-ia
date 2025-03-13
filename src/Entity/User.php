@@ -42,9 +42,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $businessProfiles;
 
+    /**
+     * @ORM\OneToMany(targetEntity=OpenaiApiLog::class, mappedBy="user")
+     */
+    private $openaiApiLogs;
+
     public function __construct()
     {
         $this->businessProfiles = new ArrayCollection();
+        $this->openaiApiLogs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -160,6 +166,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($businessProfile->getUser() === $this) {
                 $businessProfile->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OpenaiApiLog>
+     */
+    public function getOpenaiApiLogs(): Collection
+    {
+        return $this->openaiApiLogs;
+    }
+
+    public function addOpenaiApiLog(OpenaiApiLog $openaiApiLog): self
+    {
+        if (!$this->openaiApiLogs->contains($openaiApiLog)) {
+            $this->openaiApiLogs[] = $openaiApiLog;
+            $openaiApiLog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOpenaiApiLog(OpenaiApiLog $openaiApiLog): self
+    {
+        if ($this->openaiApiLogs->removeElement($openaiApiLog)) {
+            // set the owning side to null (unless already changed)
+            if ($openaiApiLog->getUser() === $this) {
+                $openaiApiLog->setUser(null);
             }
         }
 
